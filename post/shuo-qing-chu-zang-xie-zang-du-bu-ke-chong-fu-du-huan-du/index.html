@@ -1,0 +1,235 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+<meta name="description" content=""/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>说清楚脏写、脏读、不可重复读、幻读 | 因始</title>
+
+<link rel="shortcut icon" href="https://j6l.5431998.xyz/favicon.ico?v=1617087446129">
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://j6l.5431998.xyz/styles/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.27.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+<!-- DEMO JS -->
+<!--<script src="media/scripts/index.js"></script>-->
+
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css">
+</head>
+<body>
+<div class="main gt-bg-theme-color-first">
+    <nav class="navbar navbar-expand-lg">
+    <div class="navbar-brand">
+        <img class="user-avatar" src="/images/avatar.png" alt="头像">
+        <div class="site-name gt-c-content-color-first">
+            因始
+        </div>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav mr-auto" style="text-align: center">
+            
+                <div class="nav-item">
+                    
+                        <a href="/" class="menu gt-a-link">
+                            首页
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/archives" class="menu gt-a-link">
+                            归档
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/tags" class="menu gt-a-link">
+                            标签
+                        </a>
+                    
+                </div>
+            
+                <div class="nav-item">
+                    
+                        <a href="/post/about" class="menu gt-a-link">
+                            关于
+                        </a>
+                    
+                </div>
+            
+        </div>
+        <div style="text-align: center">
+            <form id="gridea-search-form" style="position: relative" data-update="1617087446129" action="/search/index.html">
+                <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
+                <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
+            </form>
+        </div>
+    </div>
+</nav>
+
+    <div class="post-container">
+        <div class="post-detail gt-bg-theme-color-second">
+            <article class="gt-post-content">
+                <h2 class="post-title">
+                    说清楚脏写、脏读、不可重复读、幻读
+                </h2>
+                <div class="post-info">
+                    <time class="post-time gt-c-content-color-first">
+                        · 2020-08-03 ·
+                    </time>
+                    
+                        <a href="https://j6l.5431998.xyz/tag/UAJ7lKP20/" class="post-tags">
+                            # java
+                        </a>
+                    
+                </div>
+                <div class="post-content">
+                    <p>我们都知道 MySQL 是支持多事务并发执行的，否则一个事务一个事务串行化处理，用户都要砸键盘了。那么，多个事务同时写一行数据怎么处理？一个事务在写数据的时候，另一个事务要读，又该怎么处理这个冲突？为了解决这些问题，MySQL 使用了 MVCC 多版本控制机制、事务隔离机制、锁。</p>
+<p>最耳熟能详的就是，事务可以分成 4 个隔离级别：读未提交、读已提交、可重复读、串行化。用的最多的就是 InnoDB 默认的隔离级别——是可重复读 <a href="https://dev.mysql.com/doc/refman/8.0/en/glossary.html#glos_repeatable_read">REPEATABLE READ</a>，一般会叫它的缩写「RR」。</p>
+<p>🤔 到这里，不知道你有没有产生几个疑问？</p>
+<ul>
+<li>我们知道有事务隔离这回事儿，那为什么要隔离？为什么隔离还不够，还要分级？</li>
+<li>事务隔离级别解决了什么问题？没有解决什么问题？</li>
+<li>MySQL 是如何实现这几个隔离级别的呢？它们底层的工作原理是什么呢？</li>
+</ul>
+<h2 id="多个事务并发执行是怎么一个场景呢">多个事务并发执行，是怎么一个场景呢？<a href="#1145118021">#</a></h2>
+<p>不知道你第一次听到「事务隔离机制」的时候是怎么想的，我的第一反应就是：<strong>好好的事务，为什么要给它隔离呢？？</strong></p>
+<p>多个事务并发执行的场景是这样的。我们有一个业务系统，里面很多线程在执行业务代码，比如说 Service 去调用 Dao，Dao 去操作数据库。在业务代码层面，对数据库的操作我们可能会给它加上事务，加上事务之后，如果执行成功就 <code>commit</code>，执行失败就要 <code>rollback</code>。</p>
+<p>上面这个流程大家肯定很熟了吧。接下来，由于 MySQL 中的数据是保存在磁盘上。但你要知道，随机读磁盘是很耗时间的，对于频繁的 IO 操作，通常的做法就是先把数据加载到内存里面。MySQL 中就有个内存组件 Buffer Pool，执行增删改查的时候，都会把数据从磁盘加载到 Buffer Pool 中，再执行增删改查操作。</p>
+<p>现在要来操作内存（Buffer Pool）中的数据了，由于 MySQL 要支持事务，它是通过什么实现事务的呢？这就涉及到 undo log、redo log 来支持 rollback 和 commit 操作了。</p>
+<p>上面讲的是一个事务执行的大致流程，那假设这里的每个线程都开启一个事务，那此时就是多个事务并发执行的场景了。</p>
+<figure data-type="image" tabindex="1"><a href="http://image.shuiyujie.com/2020-07-18-14-57-49.png"><img src="http://image.shuiyujie.com/2020-07-18-14-57-49.png" alt="" loading="lazy"></a></figure>
+<p>现在你知道多个事务并发执行是怎么一回事儿了，那又有第二个问题了：**多个事务并发又咋了，有什么问题么？又没多吃你家一块肉！**实际上这里是有问题，因为允许多个事务并发执行，那它们就可能同时访问同一行数据，这就会发生并发问题了。</p>
+<ul>
+<li>写冲突，多个事务同时对缓存页里面的一行数据进行更新，允许谁来写？这个冲突要怎么解决？可不可以用锁来解决？</li>
+<li>读写冲突，一个事务在写数据，别的事务过来读数据了，这个时候要怎么办？</li>
+</ul>
+<p>MySQL 解决它们的方法就是 MVCC 多版本控制机制、事务隔离级别、锁机制，也是后面几篇要介绍的内容。</p>
+<h2 id="8-张图告诉你脏写-脏读-不可重复读-幻读到底是怎么回事儿">8 张图告诉你，脏写、脏读、不可重复读、幻读到底是怎么回事儿<a href="#101613917">#</a></h2>
+<p>现在你已经知道了多个事务并发执行是怎么样的一个场景，也知道这样会产生各种冲突。有事务在写数据的时候，别的事务要读同一行的数据那怎么办？一个事务写到一半反悔了，要回滚又会产生什么问题？</p>
+<p>这种读写冲突可能导致的问题，前辈都帮我们总结好了，就是<strong>脏写、脏读、不可重复读和幻读</strong>的问题。</p>
+<h3 id="脏写"><strong>脏写</strong><a href="#3502970978">#</a></h3>
+<p>MySQL 的数据是放在一个个缓存页里面的，然后每个缓存页里面是一行行的数据，就像下面这张图这样：</p>
+<figure data-type="image" tabindex="2"><a href="http://image.shuiyujie.com/2020-07-21-21-03-01.png"><img src="http://image.shuiyujie.com/2020-07-21-21-03-01.png" alt="" loading="lazy"></a></figure>
+<p>现在有一个事务 A 正在执行，它执行的是一个写操作，原来有一行数据是 NULL，在它执行了 update 操作，把 NULL 改成了值 A，就像下面这张图这样：</p>
+<figure data-type="image" tabindex="3"><a href="http://image.shuiyujie.com/2020-07-21-21-05-47.png"><img src="http://image.shuiyujie.com/2020-07-21-21-05-47.png" alt="" loading="lazy"></a></figure>
+<p>注意，这里事务 A 更新了一行数据但是它并没有提交。紧接着事务 B 也来写这行数据了，这就是多个事务并发执行，还操作同一行数据的场景了。事务 B 做的也是 update 操作，把值 A 改成了值 B，如下图所示：</p>
+<figure data-type="image" tabindex="4"><a href="http://image.shuiyujie.com/2020-07-21-21-07-58.png"><img src="http://image.shuiyujie.com/2020-07-21-21-07-58.png" alt="" loading="lazy"></a></figure>
+<p>前面说了事务 A 此时是没有提交的，除了提交事务，还可以干嘛？对了，事务 A 是可以<strong>回滚</strong>的！回滚意味着什么？回滚是不是就意味着原来那一行数据，要回滚到事务 A 执行之前的那个值，也就是 NULL：</p>
+<figure data-type="image" tabindex="5"><a href="http://image.shuiyujie.com/2020-07-21-21-09-55.png"><img src="http://image.shuiyujie.com/2020-07-21-21-09-55.png" alt="" loading="lazy"></a></figure>
+<p>事务 A 回滚了，对于事务 B 意味着什么？事务 B 明明正常写了一行数据，但是写完之后发现值变了，变成一个莫名其妙的值。</p>
+<p>这就是脏写，脏写就是说我两个事务来写同一行数据，但是前面的那个事务反悔了，回滚了。在后面的事务 B 眼里，我明明修改了数据，怎么会写错呢？它打算也想不到，是别的事务回滚了。</p>
+<h3 id="脏读"><strong>脏读</strong><a href="#2661185300">#</a></h3>
+<p>脏读的情况和脏写差不多喽：</p>
+<figure data-type="image" tabindex="6"><a href="http://image.shuiyujie.com/2020-07-18-15-50-48.png"><img src="http://image.shuiyujie.com/2020-07-18-15-50-48.png" alt="" loading="lazy"></a></figure>
+<ol>
+<li>事务 A 先写数据，把一行数据的值从 null 改成了 A，同样事务 A 并没有提交；</li>
+<li>然后事务 B 过来读了，它读到的值自然是 A 喽；</li>
+<li>接着事务 A 又回滚了！回滚之后值就要从 A 变回到 NULL；</li>
+<li>事务 B 再去读的时候读到的就是 NULL 了</li>
+</ol>
+<p>脏读就是事务 B 因为事务 A 回滚，读不到之前的值了。</p>
+<h3 id="不可重复读"><strong>不可重复读</strong><a href="#1051679049">#</a></h3>
+<figure data-type="image" tabindex="7"><a href="http://image.shuiyujie.com/2020-07-18-16-00-18.png"><img src="http://image.shuiyujie.com/2020-07-18-16-00-18.png" alt="" loading="lazy"></a></figure>
+<ol>
+<li>事务 A 先去读一行数据，读到值是 A；</li>
+<li>事务 B 去修改数据，改成了 B。这里和前面不一样的地方就在，事务 B 它还提交了，不回滚了。</li>
+<li>事务 A 第二次去读，读到的是 B，和第一次读到的 A 不一样。</li>
+</ol>
+<p>那不可重复读是指什么？它是指在同一个事务里面查询同一行数据，每次查到的数据都不一样。是不是和脏读很像，区别在于脏读是由于别的事务回滚导致，而不可重复读读到的其实是已经提交的数据。</p>
+<h3 id="幻读"><strong>幻读</strong><a href="#888635572">#</a></h3>
+<figure data-type="image" tabindex="8"><a href="http://image.shuiyujie.com/2020-07-18-16-05-08.png"><img src="http://image.shuiyujie.com/2020-07-18-16-05-08.png" alt="" loading="lazy"></a></figure>
+<p>最后就剩下幻读了，前面的脏写、脏读、不可重复读，都是针对一行数据来说的，幻读不一样，幻读是指查到了之前没有的一批数据：</p>
+<ol>
+<li>事务 A 里有一个条件查询的语句 <code>select name from t where id &gt; 10</code>，它进行了一次范围查询，查到了 10 行数据；</li>
+<li>然后事务 B 网里面加入了一批数据</li>
+<li>事务 A 再查的用条件查询语句查询的时候，发现查到了 15 条，其中 5 条是之前没见过的。这个事务 A 以为自己出现幻觉了，怎么会多出这么些个数据？这就是幻读了。</li>
+</ol>
+<h2 id="事务隔离机制是如何解决脏写-脏读-不可重复读和幻读问题的">事务隔离机制是如何解决脏写、脏读、不可重复读和幻读问题的<a href="#1109131862">#</a></h2>
+<p>前面讲到了，多事务并发执行是会带来脏写、脏读、不可重复读和幻读的问题，MySQL 是如何解决这个问题的呢？答案其实每个人都听过，就是使用事务隔离机制，包括 read uncommitted（读未提交），read committed（读已提交），repeatable read（可重复读），serializable（串行化）这几个隔离级别。</p>
+<p>我们回过头来看脏写和脏读。它们其实都是后面的事务正常执行，但是前面的事务回滚了导致的。这个时候它们就是处在 read uncommitted（读未提交）这个隔离级别之下，能够读到别人没有提交的事务。</p>
+<figure data-type="image" tabindex="9"><a href="http://image.shuiyujie.com/2020-07-18-15-50-48.png"><img src="http://image.shuiyujie.com/2020-07-18-15-50-48.png" alt="" loading="lazy"></a></figure>
+<p>那么现在提高事务的隔离级别，变成 read committed（读已提交）会怎么样呢？比如说脏读，事务 A 修改了值，从 NULL 变成了值 A。这个时候事务 B 来读，由于隔离级别是 RC，事务 A 没有提交事务的情况下，事务 B 是读不到的，也就不存在事务 A 回滚导致事务 B 第二次读到值和第一次不一样了。</p>
+<p>不可重复读和幻读则与脏写和脏读有所区别了，它们读到的都是已经提交了的事务。但是在 repeatable read（可重复读）这个隔离级别中，就能够做到事务开启之后，不论别的事务是否提交，它读到的值都和最开始一样。这就要基于 MVCC 多版本控制机制来讲了，在这里先卖个关子，后面会专门写一篇文章来讲 MySQL 的 RR 是如何实现的。</p>
+<p>最后就是 serializable（串行化），串行化很好理解，就是一次只能执行一个事务，完全禁止并发，大家排好队一个个执行，啥事儿都没有喽。但实际开发中是不会有人用这个隔离级别的，重点再念一遍「RR」repeatable read（可重复读）。</p>
+<h2 id="小结">小结<a href="#4289110816">#</a></h2>
+<p>先回顾一下，这篇文章先讲了多事务并发执行的场景是怎么样的？紧接着引出了多事务并发可能带来的问题，其中就包括脏写、脏读、不可重复读和幻读。最后介绍了一个事务的隔离级别：read uncommitted（读未提交），read committed（读已提交），repeatable read（可重复读），serializable（串行化），以及它们是如何解决脏写、脏读、不可重复读和幻读问题的。</p>
+<p>文章中还留下一个小坑没有填，那就是 MySQL 中最常用到的隔离级别可重复读是怎么实现，MVCC 版本控制机制是到底是什么意思。</p>
+<blockquote>
+<p>原文地址 https://www.cnblogs.com/shuiyj/p/13357612.html</p>
+</blockquote>
+
+                </div>
+            </article>
+        </div>
+
+        
+            <div class="next-post">
+                <div class="next gt-c-content-color-first">下一篇</div>
+                <a href="https://j6l.5431998.xyz/post/markdown-tian-jia-shi-pin-yin-pin-gif/" class="post-title gt-a-link">
+                    markdown添加 视频、音频、gif
+                </a>
+            </div>
+        
+
+        
+
+        
+
+        
+
+        <div class="site-footer gt-c-content-color-first">
+    <div class="slogan gt-c-content-color-first">我知道,所以我来了</div>
+    <div class="social-container">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    </div>
+    <div class="footer-info">
+        <div>
+            友情链接: <a href="https://dns.52hyjs.com/">免费企业域名</a>
+        </div>
+        <div>
+            本网站由<a href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral"><img src="https://gitee.com/j6l/cdnimg/raw/master/img/asd155asd15.png" style="height: 30px"/>提供CDN技术服务</a>
+        |
+            Powered by <a href="https://github.com/j6l" target="_blank">Gridea</a> | <a href="https://j6l.jielk.site/atom.xml" target="_blank">RSS</a>  <script type="text/javascript" src="//js.users.51.la/20893009.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+    </div>
+</div>
+</body>
+</html>

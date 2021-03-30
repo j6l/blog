@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://j6l.5431998.xyz</id>
+    <title>因始</title>
+    <updated>2021-03-30T06:57:36.622Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://j6l.5431998.xyz"/>
+    <link rel="self" href="https://j6l.5431998.xyz/atom.xml"/>
+    <subtitle>我知道,所以我来了</subtitle>
+    <logo>https://j6l.5431998.xyz/images/avatar.png</logo>
+    <icon>https://j6l.5431998.xyz/favicon.ico</icon>
+    <rights>All rights reserved 2021, 因始</rights>
+    <entry>
+        <title type="html"><![CDATA[test]]></title>
+        <id>https://j6l.5431998.xyz/post/test/</id>
+        <link href="https://j6l.5431998.xyz/post/test/">
+        </link>
+        <updated>2021-03-30T06:57:12.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JPA入门]]></title>
+        <id>https://j6l.5431998.xyz/post/jpa-ru-men/</id>
+        <link href="https://j6l.5431998.xyz/post/jpa-ru-men/">
+        </link>
+        <updated>2020-10-09T11:53:04.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MYsql入门]]></title>
+        <id>https://j6l.5431998.xyz/post/mysql-ru-men/</id>
+        <link href="https://j6l.5431998.xyz/post/mysql-ru-men/">
+        </link>
+        <updated>2020-10-08T02:46:25.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[yum update 升级]]></title>
+        <id>https://j6l.5431998.xyz/post/yum-update-sheng-ji/</id>
+        <link href="https://j6l.5431998.xyz/post/yum-update-sheng-ji/">
+        </link>
+        <updated>2020-09-26T06:43:54.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[UFW的简单使用]]></title>
+        <id>https://j6l.5431998.xyz/post/ufw-de-jian-dan-shi-yong/</id>
+        <link href="https://j6l.5431998.xyz/post/ufw-de-jian-dan-shi-yong/">
+        </link>
+        <updated>2020-09-12T13:29:15.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CentOS 7更换yum源 安装ufw]]></title>
+        <id>https://j6l.5431998.xyz/post/centos-7-yum-yuan-an-zhuang-ufw/</id>
+        <link href="https://j6l.5431998.xyz/post/centos-7-yum-yuan-an-zhuang-ufw/">
+        </link>
+        <updated>2020-09-12T13:18:11.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[说清楚脏写、脏读、不可重复读、幻读]]></title>
+        <id>https://j6l.5431998.xyz/post/shuo-qing-chu-zang-xie-zang-du-bu-ke-chong-fu-du-huan-du/</id>
+        <link href="https://j6l.5431998.xyz/post/shuo-qing-chu-zang-xie-zang-du-bu-ke-chong-fu-du-huan-du/">
+        </link>
+        <updated>2020-08-03T14:27:12.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[markdown添加 视频、音频、gif]]></title>
+        <id>https://j6l.5431998.xyz/post/markdown-tian-jia-shi-pin-yin-pin-gif/</id>
+        <link href="https://j6l.5431998.xyz/post/markdown-tian-jia-shi-pin-yin-pin-gif/">
+        </link>
+        <updated>2020-07-31T08:07:07.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[test贴吧视频]]></title>
+        <id>https://j6l.5431998.xyz/post/test-tie-ba-shi-pin/</id>
+        <link href="https://j6l.5431998.xyz/post/test-tie-ba-shi-pin/">
+        </link>
+        <updated>2020-07-31T07:51:36.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Debian 9 (stretch) 更换为阿里源包]]></title>
+        <id>https://j6l.5431998.xyz/post/debian-ali/</id>
+        <link href="https://j6l.5431998.xyz/post/debian-ali/">
+        </link>
+        <updated>2020-07-30T14:07:38.000Z</updated>
+    </entry>
+</feed>
