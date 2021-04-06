@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://j6l.5431998.xyz</id>
     <title>因始</title>
-    <updated>2021-04-01T07:49:28.567Z</updated>
+    <updated>2021-04-06T05:39:37.909Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://j6l.5431998.xyz"/>
     <link rel="self" href="https://j6l.5431998.xyz/atom.xml"/>
@@ -10,6 +10,13 @@
     <logo>https://j6l.5431998.xyz/images/avatar.png</logo>
     <icon>https://j6l.5431998.xyz/favicon.ico</icon>
     <rights>All rights reserved 2021, 因始</rights>
+    <entry>
+        <title type="html"><![CDATA[激活win10 office]]></title>
+        <id>https://j6l.5431998.xyz/post/ji-huo-win10-office/</id>
+        <link href="https://j6l.5431998.xyz/post/ji-huo-win10-office/">
+        </link>
+        <updated>2021-04-06T03:52:48.000Z</updated>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Docker中文控制面板]]></title>
         <id>https://j6l.5431998.xyz/post/DockerMb/</id>
@@ -72,12 +79,5 @@
         <link href="https://j6l.5431998.xyz/post/test-tie-ba-shi-pin/">
         </link>
         <updated>2020-07-31T07:51:36.000Z</updated>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Debian 9 (stretch) 更换为阿里源包]]></title>
-        <id>https://j6l.5431998.xyz/post/debian-ali/</id>
-        <link href="https://j6l.5431998.xyz/post/debian-ali/">
-        </link>
-        <updated>2020-07-30T14:07:38.000Z</updated>
     </entry>
 </feed>
