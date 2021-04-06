@@ -6,7 +6,7 @@
 
 <title>激活win10 office | 因始</title>
 
-<link rel="shortcut icon" href="https://j6l.5431998.xyz/favicon.ico?v=1617681772096">
+<link rel="shortcut icon" href="https://j6l.5431998.xyz/favicon.ico?v=1617687656357">
 
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://j6l.5431998.xyz/styles/main.css">
@@ -77,7 +77,7 @@
             
         </div>
         <div style="text-align: center">
-            <form id="gridea-search-form" style="position: relative" data-update="1617681772096" action="/search/index.html">
+            <form id="gridea-search-form" style="position: relative" data-update="1617687656357" action="/search/index.html">
                 <input class="search-input" autocomplete="off" spellcheck="false" name="q" placeholder="搜索文章" />
                 <i class="fas fa-search gt-c-content-color-first" style="position: absolute; top: 9px; left: 10px;"></i>
             </form>
@@ -106,6 +106,32 @@
 https://next.itellyou.cn/<br>
 business_editions 版本包含：Education(教育版); Enterprise (企业版); Professional(专业版)；<br>
 如无特殊需求安装专业版即可</p>
+<p>获取安装ID</p>
+<blockquote>
+<p>创建已bat没结尾的文件复制下方代码 双击运行即可</p>
+</blockquote>
+<pre><code class="language-bat">@echo off
+setlocal enabledelayedexpansion
+for /f &quot;skip=1 tokens=3,* delims=: &quot; %%i in ('cscript %windir%\system32\slmgr.vbs /dti') do set ID=%%i
+for /f &quot;delims=&quot; %%a in (&quot;%ID%&quot;) do (
+        set c0=%%a
+        set c1=!c0:~0,7!
+        set c2=!c0:~7,7!
+        set c3=!c0:~14,7!
+        set c4=!c0:~21,7!
+        set c5=!c0:~28,7!
+        set c6=!c0:~35,7!
+        set c7=!c0:~42,7!
+        set c8=!c0:~49,7!
+        set c9=!c0:~56,7!
+        echo 安装 ID：
+        echo !c1!-!c2!-!c3!-!c4!-!c5!-!c6!-!c7!-!c8!-!c9!
+        @echo !c1!-!c2!-!c3!-!c4!-!c5!-!c6!-!c7!-!c8!-!c9!&gt;&quot;%~dp0安装ID.txt&quot;
+)
+echo.
+echo.请查看当前目录下「安装ID.txt」
+pause
+</code></pre>
 
                 </div>
             </article>
